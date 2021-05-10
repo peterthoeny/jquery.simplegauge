@@ -1,0 +1,83 @@
+/**
+ * Simple gauge plugin for jQuery
+ * @version    0.9.0
+ * @release    2021-05-10
+ * @repository https://github.com/peterthoeny/jquery.simplegauge
+ * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
+ * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
+ * @license    MIT, https://opensource.org/licenses/mit-license
+ */
+.simpleGauge_container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+}
+.simpleGauge {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    box-sizing: border-box;
+}
+.simpleGauge_block {
+    position: absolute;
+    overflow: visible;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.simpleGauge_bars {    /* Color bars */
+    width: 100%;
+    height: 100%;
+}
+.simpleGauge_bar {
+}
+.simpleGauge_arrow {    /* Arrow */
+  /* filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7)); */
+}
+.simpleGauge_arrow-circle {
+}
+.simpleGauge_labels {   /* Labels */
+}
+.simpleGauge_label {
+    position: absolute;
+}
+.simpleGauge_marks {    /* Marks */
+}
+.simpleGauge_mark {
+    position: absolute;
+    background: #999;
+    width: 1px;
+    height: 4px;
+}
+.simpleGauge_value {    /* Value */
+    position: absolute;
+}
+.simpleGauge_digital {  /* Digital Value */
+    position: absolute;
+    top: 20%;
+    left: 0;
+    bottom: 50%;
+    right: 0;
+    text-align: center;
+}
+.simpleGauge_digital span {
+    display: inline-block;
+}
+.simpleGauge_title {    /* Title */
+    position: absolute;
+    top: 60%;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+}
+.simpleGauge_title span {
+    display: inline-block;
+}
+
+/* EOF */
