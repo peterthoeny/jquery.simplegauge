@@ -1,7 +1,7 @@
 /**
  * Simple gauge plugin for jQuery
- * @version    0.9.0
- * @release    2021-05-10
+ * @version    0.9.1
+ * @release    2021-05-11
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
@@ -78,18 +78,15 @@
             this.$title     = this.$element.find('.simpleGauge_title');
             this.setContainer();
             this.getSizes();
-            if(this.options.type.match(/\bdigital\b/)) {
-                this.setDigital();
-            }
             if(this.options.type.match(/\banalog\b/)) {
                 this.setGaps();
                 this.createBars();
                 this.createArrow();
                 this.createValues();
                 this.createMarks();
-                this.setValue(this.options.value);
             }
             this.setTitle();
+            this.setValue(this.options.value); // set digital and/or analog value
         },
 
         setContainer: function () {
@@ -142,7 +139,8 @@
             var isOutside = (this.options.analog.inset === false);
             this.$bars.css({
                 left: (isOutside) ? this.gaps[0][0] : 0,
-                top:  (isOutside) ? this.gaps[0][0] : 0
+                top:  (isOutside) ? this.gaps[0][0] : 0,
+                overflow: 'visible'
             });
             this.$labels.css({
                 left: (isOutside) ? 0 : this.gaps[0][0],
@@ -240,13 +238,26 @@
             this.$bars.append(path);
         },
 
+        getValue: function () {
+            var value = this.options.value;
+            debugLog('getValue(): ' + value);
+            return value;
+        },
+
         setValue: function (value) {
+            debugLog('setValue(' + value + ')');
             this.options.value = value;
-            var percent = (value - this.options.min) / (this.options.max - this.options.min) * 100;
-            var angle = this.getPercentAngle(percent);
-            var arrow = this.$element.find('.simpleGauge_arrow');
-            var height = arrow[0].getAttribute('height');
-            arrow.attr({transform: 'rotate(' + (angle + 90) + ' ' + height + ' ' + height + ')'});
+            if(this.options.type.match(/\bdigital\b/)) {
+                this.setDigital();
+            }
+            if(this.options.type.match(/\banalog\b/)) {
+                var percent = (value - this.options.min) / (this.options.max - this.options.min) * 100;
+                var angle = this.getPercentAngle(percent);
+                var arrow = this.$element.find('.simpleGauge_arrow');
+                var height = arrow[0].getAttribute('height');
+                arrow.attr({transform: 'rotate(' + (angle + 90) + ' ' + height + ' ' + height + ')'});
+            }
+            return null;
         },
 
         createValues: function () {
@@ -263,13 +274,11 @@
             } else if(valStep < 1) {
                 factor = 10;
             }
-console.log('valStep: '+JSON.stringify(valStep))
             for(var i = 0; i <= numTicks; i++) {
                 var percent = Math.round(percentStep * i);
                 this.options.ticksMap[percent] = Math.round(val * factor) / factor;
                 val += valStep;
             }
-console.log('options.ticksMap: '+JSON.stringify(this.options.ticksMap))
             this.walkPercents(this.options.ticksMap, function (percent, angle) {
                 var coords = this.getCoordinate(angle, this.options.labelsWidth, this.options.labelsHeight);
                 var $label = $('<div>').addClass('simpleGauge_label').text(this.options.ticksMap[percent]);
@@ -297,7 +306,6 @@ console.log('options.ticksMap: '+JSON.stringify(this.options.ticksMap))
 
         setDigital: function () {
             if(this.options.digital) {
-console.log('options.digital: '+JSON.stringify(this.options.digital))
                 if(this.options.digital.text) {
                     var html = this.options.digital.text;
                     if(typeof html != 'string') {
@@ -334,7 +342,7 @@ console.log('options.digital: '+JSON.stringify(this.options.digital))
         },
 
         _styleToCss: function (style, defaults) {
-            var css = defaults;
+            var css = JSON.parse(JSON.stringify(defaults));
             if(typeof style === 'string') {
                 style.split(/\s*;\s*/).filter(Boolean).forEach(function(txt) {
                     var keyVal = txt.split(/\s*:\s*/);
@@ -342,25 +350,35 @@ console.log('options.digital: '+JSON.stringify(this.options.digital))
                         css[keyVal[0]] = keyVal[1];
                     }
                 });
+            } else if(typeof style === 'object') {
+                Object.keys(style).forEach(function(key) {
+                    css[key] = style[key];
+                });
             }
             return css;
         }
+
     };
 
-    $.fn.simpleGauge = function(options) {
-        if(typeof options === 'object' && options.debug != undefined) {
+    $.fn.simpleGauge = function(options, val) {
+        var isInit = typeof options === 'object';
+        if(isInit && options.debug != undefined) {
            debug = options.debug;
         }
-        return this.each(function () {
+        var result = null;
+        this.each(function () {
             var $this = $(this);
             var data = $this.data('plugin-simplegauge');
-            if(!data) {
+            if(isInit && !data) {
                 $this.data('plugin-simplegauge', (data = new SimpleGauge($(this), options)));
-            }
-            if(typeof options === 'string') {
-                data[options]();
+            } else if(typeof options === 'string') {
+                result = data[options](val);
+            } else {
+                // ignore undefined state
+                debugLog('error with plugin parameters');
             }
         });
+        return result;
     };
 
     $.fn.simpleGauge.defaults = {
