@@ -52,7 +52,7 @@
             </script>
             <style>
                 #demoGauge1 {
-                    width: 16em;
+                    width:  16em;
                     height: 16em;
                     margin: 1em 0 0 2.5em;
                 }
@@ -72,7 +72,7 @@ $(document).ready(function() {
 
 &lt;style>
 #demoGauge1 {
-    width: 16em;
+    width:  16em;
     height: 16em;
 }
 &lt;/style></textarea>
@@ -90,43 +90,43 @@ $(document).ready(function() {
             <script>
             $(document).ready(function() {
                 $('#demoGauge2').simpleGauge({
+                    value:  3.6234567,
+                    min:    0,
+                    max:    6,
+
                     container: {
-                        style: 'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
-                        size: 87 // percent size of gauge
+                        style:  'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
+                        size:   87 // percent size of gauge
                     },
                     title: {
-                        text: 'k RPM',
-                        style: 'color: gray; font-size: 40px; padding: 0px;'
+                        text:   'k RPM',
+                        style:  'color: gray; font-size: 40px; padding: 0px;'
                     },
                     digital: {
-                        text: '{value.3}',
-                        style: 'color: auto; font-size: 35px;'
+                        text:   '{value.3}',
+                        style:  'color: auto; font-size: 35px;'
                     },
                     analog: {
-                        numTicks: 12,
-                        minAngle: 180,
-                        maxAngle: 360,
-                        lineWidth: 10,
+                        numTicks:   12,
+                        minAngle:   -90,
+                        maxAngle:   90,
+                        lineWidth:  10,
                         arrowWidth: 20,
                         arrowColor: '#ccc',
-                        inset: false,
+                        inset:      false,
                     },
                     barColors: [
-                        [0,   '#666'],
-                        [1.0, '#378618'],
-                        [4.5, '#ffa500'],
-                        [5.5, '#f00']
-                    ],
-
-                    min: 0,
-                    max: 6,
-                    value: 3.6234567
+                        [ 0,   '#666666' ],
+                        [ 1.0, '#378618' ],
+                        [ 4.5, '#ffa500' ],
+                        [ 5.5, '#dd2222' ]
+                    ]
                 });
             });
             </script>
             <style>
             #demoGauge2 {
-                width: 20em;
+                width:  20em;
                 height: 20em;
                 margin: 1em 0 0 0.3em;
             }
@@ -139,44 +139,44 @@ $(document).ready(function() {
 &lt;script>
 $(document).ready(function() {
     $('#demoGauge2').simpleGauge({
+        value:  3.6234567,
+        min:    0,
+        max:    6,
+
         container: {
-            style: 'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
-            size: 87
+            style:  'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
+            size:   87 // percent size of gauge
         },
         title: {
-            text: 'k RPM',
-            style: 'color: gray; font-size: 40px; padding: 0px;'
+            text:   'k RPM',
+            style:  'color: gray; font-size: 40px; padding: 0px;'
         },
         digital: {
-            text: '{value.3}',
-            style: 'color: auto; font-size: 30px;'
+            text:   '{value.3}',
+            style:  'color: auto; font-size: 35px;'
         },
         analog: {
-            numTicks: 12,
-            minAngle: 180,
-            maxAngle: 360,
-            lineWidth: 10,
+            numTicks:   12,
+            minAngle:   -90,
+            maxAngle:   90,
+            lineWidth:  10,
             arrowWidth: 20,
             arrowColor: '#ccc',
-            inset: false,
+            inset:      false,
         },
         barColors: [
-            [0,   '#666'],
-            [1.0, '#378618'],
-            [4.5, '#ffa500'],
-            [5.5, '#f00']
-        ],
-
-        min: 0,
-        max: 6,
-        value: 3.6234567
+            [ 0,   '#66666'  ],
+            [ 1.0, '#378618' ],
+            [ 4.5, '#ffa500' ],
+            [ 5.5, '#dd2222' ]
+        ]
     });
 });
 &lt;/script>
 
 &lt;style>
 #demoGauge2 {
-    width: 20em;
+    width:  20em;
     height: 20em;
 }
 &lt;/style></textarea>

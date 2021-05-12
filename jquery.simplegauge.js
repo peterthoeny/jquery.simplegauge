@@ -1,6 +1,6 @@
 /**
  * Simple gauge plugin for jQuery
- * @version    0.9.1
+ * @version    0.9.2
  * @release    2021-05-11
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
@@ -166,7 +166,7 @@
         },
 
         getPercentAngle: function (percent) {
-            return ((percent * 0.01 * (this.options.analog.maxAngle - this.options.analog.minAngle)) + this.options.analog.minAngle);
+            return ((percent * 0.01 * (this.options.analog.maxAngle - 90 - this.options.analog.minAngle + 90)) + this.options.analog.minAngle - 90);
         },
 
         getCoordinate: function (angle, w, h) {
@@ -180,7 +180,7 @@
         createBars: function () {
             var self = this;
             var color;
-            var lastAngle = this.options.analog.minAngle;
+            var lastAngle = this.options.analog.minAngle - 90;
             this.$bars.html('');
             this.walkPercents(this.options.colors, function (percent, angle) {
                 if (color) {
@@ -189,7 +189,7 @@
                 color     = this.options.colors[percent];
                 lastAngle = angle;
             });
-            var endAngle = this.options.analog.maxAngle;
+            var endAngle = this.options.analog.maxAngle - 90;
             self.createBar(lastAngle, endAngle, color);
         },
 
@@ -394,7 +394,11 @@
             '</div>'
         ].join(''),
 
-        type: 'analog digital',
+        min:    0,
+        max:    100,
+        value:  0,
+
+        type:   'analog digital',
         container: {
             style: {
             },
@@ -403,38 +407,34 @@
         title: {
             text: '',
             style: {
-                padding: '5px 7px',
-                'font-size': '30px'
+                padding:        '5px 7px',
+                'font-size':    '30px'
             }
         },
         digital: {
             text: '{value.1}',
             style: {
-                padding: '5px 7px',
-                color: 'auto',
-                'font-size': '25px',
-                'font-family': '"Digital Dream Skew Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
-                'text-shadow': '#999 2px 2px 4px'
+                padding:        '5px 7px',
+                color:          'auto',
+                'font-size':    '25px',
+                'font-family':  '"Digital Dream Skew Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
+                'text-shadow':  '#999 2px 2px 4px'
             }
         },
         analog: {
-            numTicks: 10,
-            minAngle: 150,
-            maxAngle: 390,
-            lineWidth: 10,
+            numTicks:   10,
+            minAngle:   -120,
+            maxAngle:   120,
+            lineWidth:  10,
             arrowWidth: 10,
             arrowColor: '#486e85',
-            inset: false
+            inset:      false
         },
         barColors: [
-            [ 0,  '#666' ],
+            [ 0,  '#666666' ],
             [ 50, '#ffa500' ],
-            [ 90, '#ee2222' ]
-        ],
-
-        min: 0,
-        max: 100,
-        value: 0
+            [ 90, '#dd2222' ]
+        ]
     };
 
 })(jQuery);
