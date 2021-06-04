@@ -1,10 +1,10 @@
-# jquery.simplegauge v1.0.0
+# jquery.simplegauge v1.0.1
 
 [![GitHub issues](https://img.shields.io/github/issues/peterthoeny/jquery.simplegauge)](https://github.com/peterthoeny/jquery.simplegauge/issues)
 [![GitHub stars](https://img.shields.io/github/stars/peterthoeny/jquery.simplegauge)](https://github.com/peterthoeny/jquery.simplegauge/stargazers)
 [![GitHub license](https://img.shields.io/github/license/peterthoeny/jquery.simplegauge)](https://github.com/peterthoeny/jquery.simplegauge/blob/master/LICENSE)
 
-jquery.simplegauge is a simple jQuery plugin to show an analog and/or digital gauge.
+Simple analog and digital gauge plugin for jQuery to build dashboards.
 
 ![Sample screenshot](screenshot.png)
 
@@ -19,12 +19,11 @@ jquery.simplegauge is a simple jQuery plugin to show an analog and/or digital ga
 
 <script>
 $(document).ready(function() {
-  var gaugeOptions = {
+  $('#demoGauge').simpleGauge({
     min: 0,
     max: 100,
     value: 65
-  };
-  $('#demoGauge').simpleGauge(gaugeOptions);
+  });
 });
 </script>
 ```
@@ -84,7 +83,7 @@ $('#demoGauge').simpleGauge({
     scale2: 93,                 // outer scale, default: 83
     style:  'width: 2px;'       // style, default: ''
   },
-  subTicks: {                   // sub-ticks, between ticks
+  subTicks: {                   // sub-ticks (small ticks between ticks)
     count:  5,                  // number of sub-ticks, 0 for none, default: 0
     scale1: 93,                 // inner scale, default: 80
     scale2: 96,                 // outer scale, default: 83
@@ -105,9 +104,12 @@ $('#demoGauge').simpleGauge({
     scale: 95,                  // scale in percent, default: 85
     shape: '2,100 -2,100 ...',  // custom shape, string with coordinates (see note)
     style: 'color: #ee0;'       // style, default: 'color: #778'
-  }
+  },
+  debug:   true                 // show debug messages, default: false
 });
 ```
+
+Note: The scale value indicates the size, where 0 is the center of the gauge, and 100 is the edge of the gauge.
 
 Note: The `pointer.shape` option defines the shape of the pointer in the form of space separated `x,y` coordinates. Coordinate `0,0` is the center of the gauge, `0,100` is tip of the pointer. The first and last coordinate should match. Default shape:
 

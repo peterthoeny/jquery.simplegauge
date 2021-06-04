@@ -34,7 +34,7 @@
     <div id="container">
 <!-- === EXAMPLE 1 ======================== -->
         <h1>Demo of <tt>jquery.simplegauge</tt></h1>
-        <p>Simple analog and digital gauge plugin for jQuery.</p>
+        <p>Simple analog and digital gauge plugin for jQuery to build dashboards.</p>
         <hr />
         <h2>Example 1: Simple gauge using defaults</h2>
         <table class="demoTable"><tr><th>
@@ -172,7 +172,7 @@ $(document).ready(function() {
                         $('#runAnimation').text('Stop Animation');
                         gaugeTimerCount = 0;
                         gaugeTimerId = setInterval(function() {
-                            var value = 100 * $('#demoGauge2').simpleGauge('getValue');
+                            let value = 100 * $('#demoGauge2').simpleGauge('getValue');
                             if(gaugeTimerCount > 0) {
                                 value -= Math.random() * 5;
                                 gaugeTimerCount--;
@@ -284,7 +284,7 @@ $(document).ready(function() {
       $('#runAnimation').text('Stop Animation');
       gaugeTimerCount = 0;
       gaugeTimerId = setInterval(function() {
-        var value = 100 * $('#demoGauge2').simpleGauge('getValue');
+        let value = 100 * $('#demoGauge2').simpleGauge('getValue');
         if(gaugeTimerCount > 0) {
           value -= Math.random() * 5;
           gaugeTimerCount--;

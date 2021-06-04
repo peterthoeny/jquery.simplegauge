@@ -1,7 +1,7 @@
 /**
- * Simple gauge plugin for jQuery
- * @version    1.0.0
- * @release    2021-06-03
+ * Simple analog and digital gauge plugin for jQuery to build dashboards
+ * @version    1.0.1
+ * @release    2021-06-04
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
@@ -11,7 +11,7 @@
 
     'use strict';
 
-    let debug = true;
+    let debug = false;
 
     function debugLog(msg) {
         if(debug) {
@@ -150,7 +150,7 @@
         },
 */
         getBarColor: function (value) {
-            var color = '#666';
+            let color = '#666';
             this.options.bars.colors.forEach(function(set) {
                 if(set[0] <= value) {
                    color = set[1];
@@ -296,7 +296,7 @@
         },
 
         appendSVG: function ($elem, type, attributes) {
-            var path = document.createElementNS('http://www.w3.org/2000/svg', type);
+            let path = document.createElementNS('http://www.w3.org/2000/svg', type);
             $.each(attributes, function (name, value) {
                 path.setAttribute(name, value);
             });
@@ -304,7 +304,7 @@
         },
 
         getValue: function () {
-            var value = this.options.value;
+            let value = this.options.value;
             debugLog('getValue(): ' + value);
             return value;
         },
@@ -327,7 +327,7 @@
                 if(typeof html != 'string') {
                     html = $.fn.simpleGauge.defaults.digital.text;
                 }
-                var value = this.options.value;
+                let value = this.options.value;
                 html = html.replace(/\{value(?:\.(\d+))?\}/g, function(m, c1) {
                     if(c1) {
                         let factor = 10 ** parseInt(c1);
@@ -381,10 +381,10 @@
         },
 
         _styleToCss: function (style, defaults) {
-            var css = JSON.parse(JSON.stringify(defaults));
+            let css = JSON.parse(JSON.stringify(defaults));
             if(typeof style === 'string') {
                 style.split(/\s*;\s*/).filter(Boolean).forEach(function(txt) {
-                    var keyVal = txt.split(/\s*:\s*/);
+                    let keyVal = txt.split(/\s*:\s*/);
                     if(keyVal.length === 2) {
                         css[keyVal[0]] = keyVal[1];
                     }
@@ -400,14 +400,14 @@
     };
 
     $.fn.simpleGauge = function(options, val) {
-        var isInit = typeof options === 'object';
+        let isInit = typeof options === 'object';
         if(isInit && options.debug != undefined) {
            debug = options.debug;
         }
-        var result = null;
+        let result = null;
         this.each(function () {
-            var $this = $(this);
-            var data = $this.data('plugin-simplegauge');
+            let $this = $(this);
+            let data = $this.data('plugin-simplegauge');
             if(isInit && !data) {
                 $this.data('plugin-simplegauge', (data = new SimpleGauge($(this), options)));
             } else if(typeof options === 'string') {
