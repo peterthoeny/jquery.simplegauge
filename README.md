@@ -115,6 +115,6 @@ Note: The `pointer.shape` option defines the shape of the pointer in the form of
 
 ## Demo
 
-See [demo.html](https://peterthoeny.github.io/jquery.simplegauge/demo.html)
+See [/jquery.simplegauge/index.html](https://peterthoeny.github.io/jquery.simplegauge/index.html)
 
 // EOF
