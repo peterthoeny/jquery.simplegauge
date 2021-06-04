@@ -103,7 +103,7 @@ $('#demoGauge').simpleGauge({
   },
   pointer: {                    // pointer (gauge digit)
     scale: 95,                  // scale in percent, default: 85
-    shape: '2,100 -2,100 ...',  // custom shape, string with coordinates (see notes)
+    shape: '2,100 -2,100 ...',  // custom shape, string with coordinates (see note)
     style: 'color: #ee0;'       // style, default: 'color: #778'
   }
 });
@@ -115,6 +115,6 @@ Note: The `pointer.shape` option defines the shape of the pointer in the form of
 
 ## Demo
 
-See [/jquery.simplegauge/index.html](https://peterthoeny.github.io/jquery.simplegauge/index.html)
+See [jquery.simplegauge/index.html](https://peterthoeny.github.io/jquery.simplegauge/index.html)
 
 // EOF
