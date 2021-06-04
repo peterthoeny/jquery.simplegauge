@@ -1,12 +1,11 @@
 /**
  * Simple gauge plugin for jQuery
- * @version    0.9.2
- * @release    2021-05-11
+ * @version    1.0.0
+ * @release    2021-06-03
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
  * @license    MIT, https://opensource.org/licenses/mit-license
- * fork of:    https://github.com/henus/jquery-gauge
  */
 (function($) {
 
@@ -23,7 +22,7 @@
     /**
      *  SimpleGauge class definition
      */
-    var SimpleGauge = function (element, options) {
+    let SimpleGauge = function (element, options) {
         if (element && element instanceof jQuery) {
             this.init(element, options);
         }
@@ -32,35 +31,9 @@
     SimpleGauge.prototype = {
         constructor: SimpleGauge,
 
-        gaps: [
-            [20, 12],
-            [20, 8]
-        ],
-
-        mergeDeep: function(target, source) {
-            function _isObject(item) {
-                return (item && typeof item === 'object' && !Array.isArray(item));
-            }
-            let output = Object.assign({}, target);
-            if (_isObject(target) && _isObject(source)) {
-                Object.keys(source).forEach(key => {
-                    if (_isObject(source[key])) {
-                        if (!(key in target)) {
-                            Object.assign(output, { [key]: source[key] });
-                        } else {
-                            output[key] = this.mergeDeep(target[key], source[key]);
-                        }
-                    } else {
-                        Object.assign(output, { [key]: source[key] });
-                    }
-                });
-            }
-            return output;
-        },
-
         init: function (element, options) {
-            var self = this;
-            this.options = this.mergeDeep($.fn.simpleGauge.defaults, options);
+            let self = this;
+            this.options = this._mergeDeep($.fn.simpleGauge.defaults, options);
             this.$element = $(element);
             this.draw();
             $(window).on('resize', function () {
@@ -71,63 +44,114 @@
         draw: function () {
             this.$element.html(this.options.template);
             this.$container = this.$element.find('.simpleGauge_container');
+            this.$gauge     = this.$element.find('.simpleGauge');
             this.$bars      = this.$element.find('.simpleGauge_bars');
             this.$labels    = this.$element.find('.simpleGauge_labels');
-            this.$marks     = this.$element.find('.simpleGauge_marks');
+            this.$ticks     = this.$element.find('.simpleGauge_ticks');
+            this.$pointers  = this.$element.find('.simpleGauge_pointers');
             this.$digital   = this.$element.find('.simpleGauge_digital');
             this.$title     = this.$element.find('.simpleGauge_title');
             this.setContainer();
-            this.getSizes();
-            if(this.options.type.match(/\banalog\b/)) {
-                this.setGaps();
-                this.createBars();
-                this.createArrow();
-                this.createValues();
-                this.createMarks();
-            }
             this.setTitle();
+            if(this.options.type.match(/\banalog\b/)) {
+                this.createAnalogBars();
+                this.createAnalogLabels();
+                this.createAnalogTicks();
+                this.createAnalogPointer();
+            }
             this.setValue(this.options.value); // set digital and/or analog value
         },
 
         setContainer: function () {
+            let eWidth = this.$element.width();
+            let eHeight = this.$element.height();
+            let cWidth = this.options.width;
+            let cHeight = this.options.height;
+            if(typeof cWidth === 'string') {
+                let m = cWidth.match(/([+\-0-9\.]+)(%?)/) || [ eWidth ];
+                cWidth = m[2] ? eWidth * Number(m[1]) / 100 : Number(m[1]);
+            }
+            if(typeof cHeight === 'string') {
+                let m = cHeight.match(/([+\-0-9\.]+)(%?)/) || [ eHeight ]
+                cHeight = m[2] ? eHeight * Number(m[1]) / 100 : Number(m[1]);
+            }
+            if(!cWidth && !cHeight) {
+                cWidth = Math.min(eWidth, eHeight);
+                cHeight = cWidth;
+            } else if(!cWidth) {
+                cWidth = eWidth;
+            } else if(!cHeight) {
+                cHeight = eHeight;
+            }
+            this.$container.css({
+                marginLeft: (eWidth - cWidth) / 2,
+                marginTop:  (eHeight - cHeight) / 2,
+                width:      cWidth,
+                height:     cHeight
+            });
             if(this.options.container) {
                 if(this.options.container.style) {
-                    var style = this.options.container.style;
-                    var css = this._styleToCss(style, $.fn.simpleGauge.defaults.container.style);
-                    this.$container.css(css);
+                    let style = this.options.container.style;
+                    let css = this._styleToCss(style, $.fn.simpleGauge.defaults.container.style);
+                    this.$gauge.css(css);
                 }
-                if(this.options.container.size) {
-                    var size = this.options.container.size;
-                    var css = {
-                        width: size + '%',
-                        height: size + '%'
+                let scale = this.options.container.scale;
+                if(scale) {
+                    let css = {
+                        width: scale + '%',
+                        height: scale + '%'
                     };
-                    this.$container.find('.simpleGauge').css(css);
+                    this.$gauge.css(css);
                 }
+            }
+            this.options.gaugeWidth = this.$gauge.innerWidth();
+            this.options.gaugeHeight = this.$gauge.innerHeight();
+        },
+
+        setTitle: function () {
+            if(this.options.title && this.options.title.text) {
+                this.$title.html('<span>' + this.options.title.text + '</span>');
+                let style = this.options.title.style;
+                let css = this._styleToCss(style, $.fn.simpleGauge.defaults.title.style);
+                if(css.top) {
+                    this.$title.css({ top: css.top });
+                    delete css.top;
+                }
+                this.$title.find('> span').css(css);
             }
         },
 
-        getSizes: function () {
-            var isOutside = (this.options.analog.inset === false);
-            this.options.barsWidth  = (isOutside) ? this.$bars.innerWidth() - (this.gaps[0][0] * 2) : this.$bars.innerWidth();
-            this.options.barsHeight = (isOutside) ? this.$bars.innerHeight() - (this.gaps[0][0] * 2) : this.$bars.innerHeight();
-            this.options.labelsWidth  = (isOutside) ? this.$labels.innerWidth() : this.$labels.innerWidth() - (this.gaps[0][0] * 2);
-            this.options.labelsHeight = (isOutside) ? this.$labels.innerHeight() : this.$labels.innerHeight() - (this.gaps[0][0] * 2);
-            this.options.marksWidth  = (isOutside) ? this.$marks.innerWidth() - (this.gaps[0][1] * 2) : this.$marks.innerWidth() - (this.gaps[1][1] * 2);
-            this.options.marksHeight = (isOutside) ? this.$marks.innerHeight() - (this.gaps[0][1] * 2) : this.$marks.innerWidth() - (this.gaps[1][1] * 2);
-            var self = this;
-            var colors = {};
-            this.options.barColors.forEach(function(set) {
-                var percent = (set[0] - self.options.min) / (self.options.max - self.options.min) * 100;
-                var value = set[1];
-                colors[percent] = value;
-            });
-            this.options.colors = colors;
+        getAngleFromValue: function (value) {
+            return (((value - this.options.min) / (this.options.max - this.options.min) * (this.options.analog.maxAngle - this.options.analog.minAngle)) + this.options.analog.minAngle);
         },
 
+        getPointFromAngle: function (w, h, angle) {
+            angle = (angle - 90) * Math.PI / 180;
+            return [
+                (Math.cos(angle) * w / 2),
+                (Math.sin(angle) * h / 2)
+            ];
+        },
+/*
+        getPointFromAngleUNUSED: function (w, h, angle) {
+            w = w / 2;
+            h = h / 2;
+            angle = (angle + 0.01 + 360 * 2 - 90) % 360;
+            let a = angle * Math.PI / 180;
+            let tan = Math.tan(a);
+            let div = Math.pow(h * h + w * w * tan * tan, 0.5); // √h2+w2(tan𝜃)2
+            let x = w * h / div;
+            let y = w * h * tan / div;
+            if(angle > 90 && angle < 270) {
+                return [ -x, -y ];
+            } else {
+                return [ x, y ];
+            }
+        },
+*/
         getBarColor: function (value) {
-            var color = '#ccc';
-            this.options.barColors.forEach(function(set) {
+            var color = '#666';
+            this.options.bars.colors.forEach(function(set) {
                 if(set[0] <= value) {
                    color = set[1];
                 }
@@ -135,107 +159,148 @@
             return color;
         },
 
-        setGaps: function () {
-            var isOutside = (this.options.analog.inset === false);
-            this.$bars.css({
-                left: (isOutside) ? this.gaps[0][0] : 0,
-                top:  (isOutside) ? this.gaps[0][0] : 0,
-                overflow: 'visible'
-            });
-            this.$labels.css({
-                left: (isOutside) ? 0 : this.gaps[0][0],
-                top:  (isOutside) ? 0 : this.gaps[0][0]
-            });
-            this.$marks.css({
-                left: (isOutside) ? this.gaps[0][1] : this.gaps[1][1],
-                top:  (isOutside) ? this.gaps[0][1] : this.gaps[1][1]
-            });
-        },
-
-        walkPercents: function (obj, fn) {
-            var angle;
-            var self = this;
-            var compareNumbers = function (a, b) {
-                return a - b;
-            };
-            var percents = Object.keys(obj).map(parseFloat).sort(compareNumbers);
-            $.each(percents, function (i, percent) {
-                angle = self.getPercentAngle(percent);
-                fn.call(self, percent, angle);
-            });
-        },
-
-        getPercentAngle: function (percent) {
-            return ((percent * 0.01 * (this.options.analog.maxAngle - 90 - this.options.analog.minAngle + 90)) + this.options.analog.minAngle - 90);
-        },
-
-        getCoordinate: function (angle, w, h) {
-            angle = angle * Math.PI / 180;
-            return [
-                (Math.cos(angle) * w / 2 + w / 2),
-                (Math.sin(angle) * h / 2 + h / 2)
-            ];
-        },
-
-        createBars: function () {
-            var self = this;
-            var color;
-            var lastAngle = this.options.analog.minAngle - 90;
+        createAnalogBars: function () {
+            let self = this;
             this.$bars.html('');
-            this.walkPercents(this.options.colors, function (percent, angle) {
-                if (color) {
-                    self.createBar(lastAngle, angle, color);
+            this.$bars.css({
+                marginLeft: this.options.gaugeWidth / 2,
+                marginTop: this.options.gaugeHeight / 2
+            });
+            let maxIdx = this.options.bars.colors.length - 1;
+            this.options.bars.colors.forEach((colorArr, idx) => {
+                let startAngle = self.getAngleFromValue(colorArr[0]);
+                let endVal = idx + 1 > maxIdx ? this.options.max : this.options.bars.colors[idx + 1][0];
+                let endAngle = self.getAngleFromValue(endVal);
+                let color  = colorArr[1];
+                let scale1 = Number(colorArr[2] || this.options.bars.scale1);
+                let scale2 = Number(colorArr[3] || this.options.bars.scale2);
+                let width1  = this.options.gaugeWidth * scale1 / 100;
+                let width2 = this.options.gaugeWidth * scale2 / 100;
+                let width = (width2 + width1) / 2;
+                let height1 = this.options.gaugeHeight * scale1 / 100;
+                let height2 = this.options.gaugeHeight * scale2 / 100;
+                let height = (height2 + height1) / 2;
+                let strokeWidth = Math.abs(height2 - height1);
+                let radius = (width + height) / 2;
+                let startCoord = this.getPointFromAngle(width, height, startAngle);
+                let endCoord   = this.getPointFromAngle(width, height, endAngle);
+                let d = 'M ' + startCoord
+                      + ' A ' + width / 2 + ' ' + height / 2
+                      + ' 0 ' + (Math.abs(endAngle - startAngle) > 180 ? 1 : 0) + ' 1 ' + endCoord;
+                this.appendSVG(this.$bars, 'path', {
+                    class:  'simpleGauge_bar',
+                    style:  this.options.bars.style,
+                    d:      d,
+                    stroke: color,
+                    'stroke-width': strokeWidth,
+                    fill:   'none'
+                });
+            });
+        },
+
+        createAnalogLabels: function () {
+            this.$labels.css({
+                marginLeft: this.options.gaugeWidth / 2,
+                marginTop: this.options.gaugeHeight / 2
+            });
+            let step = (this.options.max - this.options.min) / this.options.labels.count;
+            let width = this.options.gaugeWidth * this.options.labels.scale / 100;
+            let height = this.options.gaugeHeight * this.options.labels.scale / 100;
+            for(let val = this.options.min; val <= this.options.max; val += step) {
+                let angle = this.getAngleFromValue(val);
+                let coord = this.getPointFromAngle(width, height, angle);
+                let $label = $('<div>').addClass('simpleGauge_label').text(val);
+                this.$labels.append($label);
+                let css = this._styleToCss(this.options.labels.style, {
+                    left: coord[0] - $label.width() / 2,
+                    top: coord[1] - $label.height() / 2
+                });
+                $label.css(css);
+            }
+        },
+
+        createAnalogTicks: function () {
+            this.$ticks.css({
+                marginLeft: this.options.gaugeWidth / 2,
+                marginTop: this.options.gaugeHeight / 2
+            });
+            if(this.options.ticks.count) {
+                let step = (this.options.max - this.options.min) / this.options.ticks.count;
+                let width1 = this.options.gaugeWidth * this.options.ticks.scale1 / 100;
+                let width2 = this.options.gaugeWidth * this.options.ticks.scale2 / 100;
+                let width = (width2 + width1) / 2;
+                let height1 = this.options.gaugeHeight * this.options.ticks.scale1 / 100;
+                let height2 = this.options.gaugeHeight * this.options.ticks.scale2 / 100;
+                let height = (height2 + height1) / 2;
+                let tickHeight = Math.abs(height2 - height1);
+                for(let val = this.options.min; val <= this.options.max; val += step) {
+                    let angle = this.getAngleFromValue(val);
+                    let coord = this.getPointFromAngle(width, height, angle);
+                    let $tick = $('<div>').addClass('simpleGauge_tick');
+                    this.$ticks.append($tick);
+                    let css = this._styleToCss(this.options.ticks.style, {
+                        transform: 'rotate(' + angle + 'deg)',
+                        height: tickHeight,
+                        left: coord[0] - $tick.width() / 2,
+                        top: coord[1] - tickHeight / 2
+                    });
+                    if(css.color) {
+                       css.backgroundColor = css.color;
+                    }
+                    $tick.css(css);
                 }
-                color     = this.options.colors[percent];
-                lastAngle = angle;
-            });
-            var endAngle = this.options.analog.maxAngle - 90;
-            self.createBar(lastAngle, endAngle, color);
+            }
+            if(this.options.ticks.count && this.options.subTicks.count) {
+                let step = (this.options.max - this.options.min)
+                         / (this.options.ticks.count * this.options.subTicks.count);
+                let width1 = this.options.gaugeWidth * this.options.subTicks.scale1 / 100;
+                let width2 = this.options.gaugeWidth * this.options.subTicks.scale2 / 100;
+                let width = (width2 + width1) / 2;
+                let height1 = this.options.gaugeHeight * this.options.subTicks.scale1 / 100;
+                let height2 = this.options.gaugeHeight * this.options.subTicks.scale2 / 100;
+                let height = (height2 + height1) / 2;
+                let tickHeight = Math.abs(height2 - height1);
+                for(let val = this.options.min; val <= this.options.max; val += step) {
+                    let angle = this.getAngleFromValue(val);
+                    let coord = this.getPointFromAngle(width, height, angle);
+                    let $tick = $('<div>').addClass('simpleGauge_tick');
+                    this.$ticks.append($tick);
+                    let css = this._styleToCss(this.options.subTicks.style, {
+                        transform: 'rotate(' + angle + 'deg)',
+                        height: tickHeight,
+                        left: coord[0] - $tick.width() / 2,
+                        top: coord[1] - tickHeight / 2
+                    });
+                    if(css.color) {
+                       css.backgroundColor = css.color;
+                    }
+                    $tick.css(css);
+                }
+            }
         },
 
-        createBar: function (prevAngle, nextAngle, color) {
-            var prevCoords = this.getCoordinate(prevAngle, this.options.barsWidth, this.options.barsHeight);
-            var nextCoords = this.getCoordinate(nextAngle, this.options.barsWidth, this.options.barsHeight);
-            var d = 'M ' + prevCoords + ' A ' + this.options.barsWidth / 2 + ' ' + this.options.barsHeight / 2
-                  + ' 0 ' + (Math.abs(nextAngle - prevAngle) > 180 ? 1 : 0) + ' 1 ' + nextCoords;
-            this.appendSVG('path', {
-                'class'        : 'simpleGauge_bar',
-                'd'            : d,
-                'stroke'       : color,
-                'stroke-width' : this.options.analog.lineWidth,
-                'fill'         : 'none'
+        createAnalogPointer: function () {
+            let css = this._styleToCss(this.options.pointer.style, $.fn.simpleGauge.defaults.pointer.style);
+            this.$pointers.css({
+                marginLeft: this.options.gaugeWidth / 2,
+                marginTop: this.options.gaugeHeight / 2
             });
+            this.appendSVG(this.$pointers, 'polyline', {
+                class:          'simpleGauge_pointer',
+                points:         this.options.pointer.shape,
+                fill:           css.color,
+                stroke:         css['border-color'] || css.borderColor || css.color,
+                'stroke-width': css['border-width'] || css.borderWidth || 0
+            });
+            this.$pointers.find('.simpleGauge_pointer').css(css);
         },
 
-        createArrow: function () {
-            var points = [  // digit: pointy arrow
-                this.options.barsWidth / 2 - (this.options.analog.arrowWidth / 2) + ',' + this.options.barsHeight / 2,
-                this.options.barsWidth / 2 + (this.options.analog.arrowWidth / 2) + ',' + this.options.barsHeight / 2,
-                this.options.barsWidth / 2 + ',' + '-5'
-            ].join(' ');
-            this.appendSVG('polyline', {
-                'class'  : 'simpleGauge_arrow',
-                'points' : points,
-                'fill'   : this.options.analog.arrowColor,
-                'stroke' : 'white', // this.options.arrowStrokeColor,
-                'stroke-width' : '1', // this.options.arrowStrokeWidth,
-                'height' : this.options.barsHeight / 2
-            });
-            this.appendSVG('circle', {  // center circle
-                'class' : 'simpleGauge_center',
-                'cx'    : this.options.barsWidth / 2,
-                'cy'    : this.options.barsHeight / 2,
-                'r'     : this.options.analog.arrowWidth,
-                'fill'  : this.options.analog.arrowColor
-            });
-        },
-
-        appendSVG: function (type, attributes) {
+        appendSVG: function ($elem, type, attributes) {
             var path = document.createElementNS('http://www.w3.org/2000/svg', type);
             $.each(attributes, function (name, value) {
                 path.setAttribute(name, value);
             });
-            this.$bars.append(path);
+            $elem.append(path);
         },
 
         getValue: function () {
@@ -251,94 +316,68 @@
                 this.setDigital();
             }
             if(this.options.type.match(/\banalog\b/)) {
-                var percent = (value - this.options.min) / (this.options.max - this.options.min) * 100;
-                var angle = this.getPercentAngle(percent);
-                var arrow = this.$element.find('.simpleGauge_arrow');
-                var height = arrow[0].getAttribute('height');
-                arrow.attr({transform: 'rotate(' + (angle + 90) + ' ' + height + ' ' + height + ')'});
+                this.setAnalog();
             }
             return null;
         },
 
-        createValues: function () {
-            this.options.ticksMap = {
-                
-            };
-            var numTicks = this.options.analog.numTicks;
-            var percentStep = 100 / numTicks;
-            var val = this.options.min;
-            var valStep = (this.options.max - this.options.min) / numTicks;
-            let factor = 1;
-            if(valStep < 0.1) {
-                factor = 100;
-            } else if(valStep < 1) {
-                factor = 10;
-            }
-            for(var i = 0; i <= numTicks; i++) {
-                var percent = Math.round(percentStep * i);
-                this.options.ticksMap[percent] = Math.round(val * factor) / factor;
-                val += valStep;
-            }
-            this.walkPercents(this.options.ticksMap, function (percent, angle) {
-                var coords = this.getCoordinate(angle, this.options.labelsWidth, this.options.labelsHeight);
-                var $label = $('<div>').addClass('simpleGauge_label').text(this.options.ticksMap[percent]);
-
-                this.$labels.append($label);
-                $label.css({
-                    left: coords[0] - $label.width() / 2,
-                    top: coords[1] - $label.height() / 2
-                });
-            });
-        },
-
-        createMarks: function () {
-            this.walkPercents(this.options.ticksMap, function (percent, angle) {
-                var coords = this.getCoordinate(angle, this.options.marksWidth, this.options.marksHeight);
-                var $mark = $('<div>').addClass('simpleGauge_mark');
-                this.$marks.append($mark);
-                $mark.css({
-                    transform: 'rotate(' + (angle + 90) + 'deg)',
-                    left: coords[0] - $mark.width() / 2,
-                    top: coords[1] - $mark.height() / 2
-                });
-            });
-        },
-
         setDigital: function () {
-            if(this.options.digital) {
-                if(this.options.digital.text) {
-                    var html = this.options.digital.text;
-                    if(typeof html != 'string') {
-                        html = $.fn.simpleGauge.defaults.digital.text;
-                    }
-                    var value = this.options.value;
-                    html = html.replace(/\{value(?:\.(\d+))?\}/g, function(m, c1) {
-                        if(c1) {
-                            let factor = 10 ** parseInt(c1);
-                            value = Math.round(value * factor) / factor;
-                        }
-                        return value.toString();
-                    });
-                    this.$digital.html('<span>' + html + '</span>');
-                    var style = this.options.digital.style;
-                    var css = this._styleToCss(style, $.fn.simpleGauge.defaults.digital.style);
-                    if(css.color && css.color === 'auto') {
-                        css.color = this.getBarColor(value);
-                    }
-                    this.$digital.find('> span').css(css);
+            if(this.options.digital && this.options.digital.text) {
+                let html = this.options.digital.text;
+                if(typeof html != 'string') {
+                    html = $.fn.simpleGauge.defaults.digital.text;
                 }
+                var value = this.options.value;
+                html = html.replace(/\{value(?:\.(\d+))?\}/g, function(m, c1) {
+                    if(c1) {
+                        let factor = 10 ** parseInt(c1);
+                        value = Math.round(value * factor) / factor;
+                    }
+                    return value.toString();
+                });
+                this.$digital.html('<span>' + html + '</span>');
+                let style = this.options.digital.style;
+                let css = this._styleToCss(style, $.fn.simpleGauge.defaults.digital.style);
+                if(css.top) {
+                    this.$digital.css({ top: css.top });
+                    delete css.top;
+                }
+                if(css.color && css.color === 'auto') {
+                    css.color = this.getBarColor(value);
+                }
+                this.$digital.find('> span').css(css);
             }
         },
 
-        setTitle: function () {
-            if(this.options.title) {
-                if(this.options.title.text) {
-                    this.$title.html('<span>' + this.options.title.text + '</span>');
-                    var style = this.options.title.style;
-                    var css = this._styleToCss(style, $.fn.simpleGauge.defaults.title.style);
-                    this.$title.find('> span').css(css);
-                }
+        setAnalog: function () {
+            let angle = this.getAngleFromValue(this.options.value);
+            let size = Math.min(this.options.gaugeWidth, this.options.gaugeHeight);
+            let scale = size / 100 * this.options.pointer.scale / 100 / 2;
+            let css = {
+                transform: 'scale(' + scale + ') rotate(' + (angle + 180) + 'deg)',
+            };
+            this.$pointers.find('.simpleGauge_pointer').css(css);
+        },
+
+        _mergeDeep: function(target, source) {
+            function _isObject(item) {
+                return (item && typeof item === 'object' && !Array.isArray(item));
             }
+            let output = Object.assign({}, target);
+            if (_isObject(target) && _isObject(source)) {
+                Object.keys(source).forEach(key => {
+                    if (_isObject(source[key])) {
+                        if (!(key in target)) {
+                            Object.assign(output, { [key]: source[key] });
+                        } else {
+                            output[key] = this._mergeDeep(target[key], source[key]);
+                        }
+                    } else {
+                        Object.assign(output, { [key]: source[key] });
+                    }
+                });
+            }
+            return output;
         },
 
         _styleToCss: function (style, defaults) {
@@ -385,11 +424,12 @@
         template: [
             '<div class="simpleGauge_container">',
             '<div class="simpleGauge">',
-            '<svg class="simpleGauge_bars simpleGauge_block" version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>',
-            '<div class="simpleGauge_marks simpleGauge_block"></div>',
-            '<div class="simpleGauge_labels simpleGauge_block"></div>',
-            '<div class="simpleGauge_digital"></div>',
             '<div class="simpleGauge_title"></div>',
+            '<svg class="simpleGauge_bars simpleGauge_block" version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>',
+            '<div class="simpleGauge_labels simpleGauge_block"></div>',
+            '<div class="simpleGauge_ticks simpleGauge_block"></div>',
+            '<svg class="simpleGauge_pointers simpleGauge_block" version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>',
+            '<div class="simpleGauge_digital"></div>',
             '</div>',
             '</div>'
         ].join(''),
@@ -400,41 +440,84 @@
 
         type:   'analog digital',
         container: {
-            style: {
-            },
-            size: 90
+            scale: 100,
+            style: {}
         },
         title: {
             text: '',
-            style: {
-                padding:        '5px 7px',
-                'font-size':    '30px'
-            }
+            style: {}
         },
         digital: {
             text: '{value.1}',
             style: {
-                padding:        '5px 7px',
-                color:          'auto',
-                'font-size':    '25px',
-                'font-family':  '"Digital Dream Skew Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
-                'text-shadow':  '#999 2px 2px 4px'
+                color: 'auto'
             }
         },
         analog: {
-            numTicks:   10,
             minAngle:   -120,
-            maxAngle:   120,
-            lineWidth:  10,
-            arrowWidth: 10,
-            arrowColor: '#486e85',
-            inset:      false
+            maxAngle:   120
         },
-        barColors: [
-            [ 0,  '#666666' ],
-            [ 50, '#ffa500' ],
-            [ 90, '#dd2222' ]
-        ]
+        labels: {
+            text:   '{value}',
+            count:  10,
+            scale:  95,
+            style:  ''
+        },
+        ticks: {
+            count:  10,
+            scale1: 77,
+            scale2: 83,
+            style:  ''
+        },
+        subTicks: {
+            count:  0,
+            scale1: 80,
+            scale2: 83,
+            style:  ''
+        },
+        bars: {
+            scale1: 75,
+            scale2: 80,
+            style:  '',
+            colors: [
+                [ 0,  '#666666', 0, 0 ],
+                [ 50, '#ffa500', 0, 0 ],
+                [ 90, '#dd2222', 0, 0 ]
+            ]
+        },
+        pointer: {
+            scale: 85,
+            shape: [
+                '-3,-10',
+                '3,-10',
+                '3,-6.3',
+                '5,-5',
+                '6.3,-3',
+                '7,0',
+                '6.3,3',
+                '5,5',
+                '3,6.3',
+                '3,50',
+                '1.5,96',
+                '0,100',
+                '-1.5,96',
+                '-3,50',
+                '-3,6.3',
+                '-5,5',
+                '-6.3,3',
+                '-7,0',
+                '-6.3,-3',
+                '-5,-5',
+                '-3,-6.3',
+                '-3,-10'
+            ].join(' '),
+            style: {
+                color:       '#778',
+                borderWidth: 0,
+                borderColor: '#778'
+            }
+        }
+
     };
 
 })(jQuery);

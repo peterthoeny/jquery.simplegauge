@@ -22,6 +22,7 @@
         h1 { font-size: 2em; color: #000000; margin: 3px 0 10px 0; }
         h2 { font-size: 1.2em; color: #000000; margin: 3px 0 10px 0; }
         hr { border: 0; border-bottom: 1px solid #aaa; }
+        th { text-align: left; }
         textarea {
             color: white;
             background-color: #333;
@@ -35,7 +36,7 @@
         <h1>Demo of <tt>jquery.simplegauge</tt></h1>
         <p>Simple analog and digital gauge plugin for jQuery.</p>
         <hr />
-        <h2>Example 1: Simple gauge, using mostly defaults</h2>
+        <h2>Example 1: Simple gauge using defaults</h2>
         <table class="demoTable"><tr><th>
             Demo Gauge 1
         </th><th>&nbsp;</th><th>
@@ -46,8 +47,11 @@
             <script>
                 $(document).ready(function() {
                     $('#demoGauge1').simpleGauge({
-                        value: 75.123456
+                        value: 41.2
                     });
+                    setTimeout(function() {
+                        $('#demoGauge1').simpleGauge('setValue', 75.123);
+                    }, 3000);
                 });
             </script>
             <style>
@@ -59,21 +63,24 @@
             </style>
             <div style="width: 21em; height: 1px;"></div>
         </td><td>&nbsp;</td><td style="vertical-align: top;">
-            <textarea style="width: 44em; height: 21em;" readonly="readonly">
+            <textarea style="width: 54em; height: 23em;" readonly="readonly">
 &lt;div id="demoGauge1">&lt;/div>
 
 &lt;script>
 $(document).ready(function() {
-    $('#demoGauge1').simpleGauge({
-        value: 75.123456
-    });
+  $('#demoGauge1').simpleGauge({
+    value: 41.2
+  });
+  setTimeout(function() {
+    $('#demoGauge1').simpleGauge('setValue', 75.123);
+  }, 3000);
 });
 &lt;/script>
 
 &lt;style>
 #demoGauge1 {
-    width:  16em;
-    height: 16em;
+  width:  16em;
+  height: 16em;
 }
 &lt;/style></textarea>
         </td></tr></table>
@@ -87,90 +94,178 @@ $(document).ready(function() {
         </th></tr>
         <tr><td style="vertical-align: top;">
             <div id="demoGauge2"></div>
+            <button id="runRandom">Start Animation</button>
             <script>
             $(document).ready(function() {
                 $('#demoGauge2').simpleGauge({
-                    value:  3.6234567,
+                    value:  4.12345,
                     min:    0,
-                    max:    6,
+                    max:    7,
 
+                    type:   'analog digital', // enable one or the other, or both
                     container: {
-                        style:  'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
-                        size:   87 // percent size of gauge
+                        scale:  105,          // scale of gauge, in percent
+                        style:  'background: #ddd; background: linear-gradient(335deg, #ddd 0%, #fff 30%, #fff 50%, #bbb 100%); border-radius: 1000px; border: 5px solid #bbb;'
                     },
                     title: {
-                        text:   'k RPM',
-                        style:  'color: gray; font-size: 40px; padding: 0px;'
+                        text:   'RPM x 1000',
+                        style:  'color: #555; font-size: 20px; padding: 10px; top:10%;'
                     },
                     digital: {
-                        text:   '{value.3}',
+                        text:   '{value.3}', // value with number of decimals
                         style:  'color: auto; font-size: 35px;'
                     },
                     analog: {
-                        numTicks:   12,
-                        minAngle:   -90,
-                        maxAngle:   90,
-                        lineWidth:  10,
-                        arrowWidth: 20,
-                        arrowColor: '#ccc',
-                        inset:      false,
+                        minAngle:   -150,
+                        maxAngle:   150
                     },
-                    barColors: [
-                        [ 0,   '#666666' ],
-                        [ 1.0, '#378618' ],
-                        [ 4.5, '#ffa500' ],
-                        [ 5.5, '#dd2222' ]
-                    ]
+                    labels: {
+                        text:   '{value}',
+                        count:  7,
+                        scale:  73,
+                        style:  'font-size: 20px;'
+                    },
+                    ticks: {
+                        count:  14,
+                        scale1: 84,
+                        scale2: 93,
+                        style:  'width: 2px; color: #999;'
+                    },
+                    subTicks: {
+                        count:  5,
+                        scale1: 93,
+                        scale2: 96,
+                        style:  'width: 1px; color: #bbb;'
+                    },
+                    bars: {
+                        scale1: 88,
+                        scale2: 94,
+                        style:  '',
+                        colors: [
+                            [ 0,   '#666666', 91, 92 ],
+                            [ 1.0, '#378618', 0, 0 ],
+                            [ 5.0, '#ffa500', 0, 0 ],
+                            [ 6.5, '#dd2222', 0, 0 ]
+                        ]
+                    },
+                    pointer: {
+                        scale: 95,
+                        //shape: '2,100 -2,100 ...', // x,y coordinates for custom shape
+                        style: 'color: #ee0; opacity: 0.5; filter: drop-shadow(-3px 3px 2px rgba(0, 0, 0, .7));'
+                    }
                 });
+            });
+
+            let runRandom = false;
+            let gaugeTimerId;
+            let gaugeTimerCount;
+            $(document).on('click', '#runRandom', function() {
+                runRandom = runRandom ? false : true;
+                if(gaugeTimerId) {
+                    clearTimeout(gaugeTimerId);
+                }
+                if(runRandom) {
+                    // start random
+                    $('#runRandom').text('Stop Animation');
+                    gaugeTimerCount = 0;
+                    gaugeTimerId = setInterval(function() {
+                        var value = 100 * $('#demoGauge2').simpleGauge('getValue');
+                        //console.log('oldVal: '+value);
+                        if(gaugeTimerCount > 0) {
+                            value -= Math.random() * 5;
+                            gaugeTimerCount--;
+                        } else if(gaugeTimerCount < 0) {
+                            value += Math.random() * 5;
+                            gaugeTimerCount++;
+                        } else {
+                            gaugeTimerCount = Math.round((Math.random() - 0.5) * 100);
+                        }
+                        if (value < 50) {
+                            value = 50;
+                            gaugeTimerCount = 0;
+                        } else if (value > 700) {
+                            value = 700;
+                            gaugeTimerCount = 0;
+                        }
+                        //console.log('newVal: '+value);
+                        $('#demoGauge2').simpleGauge('setValue', value / 100);
+                    }, 250);
+                } else {
+                    $('#runRandom').text('Start Animation');
+                }
             });
             </script>
             <style>
             #demoGauge2 {
                 width:  20em;
                 height: 20em;
-                margin: 1em 0 0 0.3em;
+                margin: 1em 0 1em 0.3em;
             }
             </style>
             <div style="width: 21em; height: 1px;"></div>
         </td><td>&nbsp;</td><td style="vertical-align: top;">
-            <textarea style="width: 44em; height: 56em;" readonly="readonly">
+            <textarea style="width: 54em; height: 46em;" readonly="readonly">
 &lt;div id="demoGauge2">&lt;/div>
 
 &lt;script>
 $(document).ready(function() {
-    $('#demoGauge2').simpleGauge({
-        value:  3.6234567,
-        min:    0,
-        max:    6,
+  $('#demoGauge2').simpleGauge({
+    value:  4.12345,
+    min:    0,
+    max:    7,
 
-        container: {
-            style:  'background-color: #eee; border-radius: 1000px; border: 4px solid #bbb;',
-            size:   87 // percent size of gauge
-        },
-        title: {
-            text:   'k RPM',
-            style:  'color: gray; font-size: 40px; padding: 0px;'
-        },
-        digital: {
-            text:   '{value.3}',
-            style:  'color: auto; font-size: 35px;'
-        },
-        analog: {
-            numTicks:   12,
-            minAngle:   -90,
-            maxAngle:   90,
-            lineWidth:  10,
-            arrowWidth: 20,
-            arrowColor: '#ccc',
-            inset:      false,
-        },
-        barColors: [
-            [ 0,   '#66666'  ],
-            [ 1.0, '#378618' ],
-            [ 4.5, '#ffa500' ],
-            [ 5.5, '#dd2222' ]
-        ]
-    });
+    type:   'analog digital', // enable one or the other, or both
+    container: {
+      scale:  105,            // scale of gauge, in percent
+      style:  'background: #ddd; background: linear-gradient(335deg, #ddd 0%, #fff 30%, #fff 50%, #bbb 100%); border-radius: 1000px; border: 5px solid #bbb;'
+    },
+    title: {
+      text:   'RPM x 1000',
+      style:  'color: #555; font-size: 20px; padding: 10px;'
+    },
+    digital: {
+      text:   '{value.3}', // value with number of decimals
+      style:  'color: auto; font-size: 35px;'
+    },
+    analog: {
+      minAngle:   -150,
+      maxAngle:   150
+    },
+    labels: {
+      text:   '{value}',
+      count:  7,
+      scale:  73,
+      style:  'font-size: 20px;'
+    },
+    ticks: {
+      count:  14,
+      scale1: 84,
+      scale2: 93,
+      style:  'width: 2px; color: #999;'
+    },
+    subTicks: {
+      count:  5,
+      scale1: 93,
+      scale2: 96,
+      style:  'width: 1px; color: #bbb;'
+    },
+    bars: {
+      scale1: 88,
+      scale2: 94,
+      style:  '',
+      colors: [
+        [ 0,   '#666666', 91, 92 ],
+        [ 1.0, '#378618', 0, 0 ],
+        [ 5.0, '#ffa500', 0, 0 ],
+        [ 6.5, '#dd2222', 0, 0 ]
+      ]
+    },
+    pointer: {
+      scale: 95,
+      //shape: '2,100 -2,100 ...', // x,y coordinates for custom shape
+      style: 'color: #ee0; opacity: 0.5; filter: drop-shadow(-3px 3px 2px rgba(0, 0, 0, .7));'
+    }
+  });
 });
 &lt;/script>
 
@@ -184,7 +279,7 @@ $(document).ready(function() {
         <hr />
 <!-- === COMMON HEADER ======================== -->
         <h2>Common header code</h2>
-        <textarea style="width: 70.5em; height: 12em;" readonly="readonly">
+        <textarea style="width: 80.5em; height: 12em;" readonly="readonly">
 &lt;link href="/path/to/jquery.simplegauge.css" type="text/css" rel="stylesheet">
 &lt;script src="https://code.jquery.com/jquery-latest.js" type="text/javascript" charset="utf-8">&lt;/script>
 &lt;script src="/path/to/jquery.simplegauge.js" type="text/javascript">&lt;/script>
@@ -194,6 +289,7 @@ $(document).ready(function() {
     src: URL('/path/to/digital-dream.skew-narrow.ttf') format('truetype');
 }
 &lt;/style></textarea>
+        <div>Note: The <tt>digital-dream.skew-narrow.ttf</tt> file is included in the demo directory</div>
         <hr />
         <p>Repository: <a href="https://github.com/peterthoeny/jquery.simplegauge" target="_blank">
         https://github.com/peterthoeny/jquery.simplegauge</a></p>

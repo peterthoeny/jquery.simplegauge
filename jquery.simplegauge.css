@@ -1,29 +1,28 @@
 /**
  * Simple gauge plugin for jQuery
- * @version    0.9.2
- * @release    2021-05-11
+ * @version    1.0.0
+ * @release    2021-06-03
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
  * @license    MIT, https://opensource.org/licenses/mit-license
  */
 .simpleGauge_container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, sans-serif;
+    position: absolute;
 }
 .simpleGauge {
     position: absolute;
-    width: 90%;
-    height: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 .simpleGauge_block {
     position: absolute;
+    z-index: 3;
     overflow: visible;
     top: 0;
     right: 0;
@@ -36,48 +35,56 @@
 }
 .simpleGauge_bar {
 }
-.simpleGauge_arrow {    /* Arrow */
-  /* filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7)); */
-}
-.simpleGauge_arrow-circle {
-}
 .simpleGauge_labels {   /* Labels */
+    width: 100%;
+    height: 100%;
 }
 .simpleGauge_label {
     position: absolute;
 }
-.simpleGauge_marks {    /* Marks */
+.simpleGauge_ticks {    /* Tick marks */
 }
-.simpleGauge_mark {
+.simpleGauge_tick {
     position: absolute;
     background: #999;
     width: 1px;
     height: 4px;
 }
-.simpleGauge_value {    /* Value */
-    position: absolute;
+.simpleGauge_pointers {   /* Pointer (analog gauge digit) container */
+    width: 100%;
+    height: 100%;
+}
+.simpleGauge_pointer {
 }
 .simpleGauge_digital {  /* Digital Value */
     position: absolute;
-    top: 20%;
+    z-index: 2;
+    top: 25%;
     left: 0;
-    bottom: 50%;
+    bottom: 0;
     right: 0;
     text-align: center;
+    font-size: 25px;
+    font-family: "Digital Dream Skew Narrow","Helvetica Neue",Helvetica,Arial,sans-serif;
+    text-shadow: #999 2px 2px 4px;
 }
 .simpleGauge_digital span {
     display: inline-block;
+    padding: 3px 7px;
 }
 .simpleGauge_title {    /* Title */
     position: absolute;
+    z-index: 1;
     top: 60%;
     left: 0;
     bottom: 0;
     right: 0;
     text-align: center;
+    font-size: 26px;
 }
 .simpleGauge_title span {
     display: inline-block;
+    padding: 3px 7px;
 }
 
 /* EOF */
