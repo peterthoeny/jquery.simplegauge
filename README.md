@@ -6,6 +6,8 @@
 
 jquery.simplegauge is a simple jQuery plugin to show an analog and/or digital gauge.
 
+![Sample screenshot](screenshot.png)
+
 ## Getting Started
 
 ```
