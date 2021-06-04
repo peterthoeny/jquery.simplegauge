@@ -46,9 +46,7 @@
             <div id="demoGauge1"></div>
             <script>
                 $(document).ready(function() {
-                    $('#demoGauge1').simpleGauge({
-                        value: 41.2
-                    });
+                    $('#demoGauge1').simpleGauge({ value: 41.2 });
                     setTimeout(function() {
                         $('#demoGauge1').simpleGauge('setValue', 75.123);
                     }, 3000);
@@ -61,16 +59,14 @@
                     margin: 1em 0 0 2.5em;
                 }
             </style>
-            <div style="width: 21em; height: 1px;"></div>
+            <div style="width: 21em; height: 1px; margin-top: -1em;"></div>
         </td><td>&nbsp;</td><td style="vertical-align: top;">
-            <textarea style="width: 54em; height: 23em;" readonly="readonly">
+            <textarea style="width: 54em; height: 19em;" readonly="readonly">
 &lt;div id="demoGauge1">&lt;/div>
 
 &lt;script>
 $(document).ready(function() {
-  $('#demoGauge1').simpleGauge({
-    value: 41.2
-  });
+  $('#demoGauge1').simpleGauge({ value: 41.2 });
   setTimeout(function() {
     $('#demoGauge1').simpleGauge('setValue', 75.123);
   }, 3000);
@@ -78,10 +74,7 @@ $(document).ready(function() {
 &lt;/script>
 
 &lt;style>
-#demoGauge1 {
-  width:  16em;
-  height: 16em;
-}
+#demoGauge1 { width:  16em; height: 16em; }
 &lt;/style></textarea>
         </td></tr></table>
         <hr />
@@ -272,10 +265,7 @@ $(document).ready(function() {
 &lt;/script>
 
 &lt;style>
-#demoGauge2 {
-    width:  20em;
-    height: 20em;
-}
+#demoGauge2 { width:  20em; height: 20em; }
 &lt;/style>
 
 &lt;!-- animation demo -->
