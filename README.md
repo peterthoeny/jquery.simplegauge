@@ -67,8 +67,8 @@ $('#demoGauge').simpleGauge({
                                 // 'color: auto;' will set the color based on the value
   },
   analog: {                     // anaglog gauge:
-    minAngle:   -150,           // minimum angle
-    maxAngle:   150             // maximum angle
+    minAngle:   -150,           // minimum angle in degrees, default: -120
+    maxAngle:   150             // maximum angle in degrees, default: 120
   },
   labels: {                     // gauge labels:
     text:   '{value}',          // text format of value, default: '{value}'
