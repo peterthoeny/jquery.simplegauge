@@ -1,0 +1,27 @@
+{
+  "name": "jquery.simplegauge",
+  "title": "jQuery Simple Gauge",
+  "description": "jQuery plugin to show an analog and/or digital gauge",
+  "keywords": [
+    "jquery-plugin",
+    "uix",
+    "gauge"
+  ],
+  "version": "1.1.0",
+  "author": {
+    "name": "Peter Thoeny",
+    "url": "https://github.com/peterthoeny"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://opensource.org/licenses/mit-license"
+    }
+  ],
+  "bugs": "https://github.com/peterthoeny/jquery.simplegauge/issues",
+  "homepage": "https://github.com/peterthoeny/jquery.simplegauge",
+  "repository": "https://github.com/peterthoeny/jquery.simplegauge",
+  "dependencies": {
+    "jquery": ">=1.4"
+  }
+}
