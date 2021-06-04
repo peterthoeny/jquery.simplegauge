@@ -94,7 +94,6 @@ $(document).ready(function() {
         </th></tr>
         <tr><td style="vertical-align: top;">
             <div id="demoGauge2"></div>
-            <button id="runRandom">Start Animation</button>
             <script>
             $(document).ready(function() {
                 $('#demoGauge2').simpleGauge({
@@ -155,45 +154,6 @@ $(document).ready(function() {
                     }
                 });
             });
-
-            let runRandom = false;
-            let gaugeTimerId;
-            let gaugeTimerCount;
-            $(document).on('click', '#runRandom', function() {
-                runRandom = runRandom ? false : true;
-                if(gaugeTimerId) {
-                    clearTimeout(gaugeTimerId);
-                }
-                if(runRandom) {
-                    // start random
-                    $('#runRandom').text('Stop Animation');
-                    gaugeTimerCount = 0;
-                    gaugeTimerId = setInterval(function() {
-                        var value = 100 * $('#demoGauge2').simpleGauge('getValue');
-                        //console.log('oldVal: '+value);
-                        if(gaugeTimerCount > 0) {
-                            value -= Math.random() * 5;
-                            gaugeTimerCount--;
-                        } else if(gaugeTimerCount < 0) {
-                            value += Math.random() * 5;
-                            gaugeTimerCount++;
-                        } else {
-                            gaugeTimerCount = Math.round((Math.random() - 0.5) * 100);
-                        }
-                        if (value < 50) {
-                            value = 50;
-                            gaugeTimerCount = 0;
-                        } else if (value > 700) {
-                            value = 700;
-                            gaugeTimerCount = 0;
-                        }
-                        //console.log('newVal: '+value);
-                        $('#demoGauge2').simpleGauge('setValue', value / 100);
-                    }, 250);
-                } else {
-                    $('#runRandom').text('Start Animation');
-                }
-            });
             </script>
             <style>
             #demoGauge2 {
@@ -202,6 +162,48 @@ $(document).ready(function() {
                 margin: 1em 0 1em 0.3em;
             }
             </style>
+
+            <!-- animation demo -->
+            <button id="runAnimation">Start Animation</button>
+            <script>
+            $(document).ready(function() {
+                let runAnimation = false;
+                let gaugeTimerId;
+                let gaugeTimerCount;
+                $(document).on('click', '#runAnimation', function() {
+                    runAnimation = runAnimation ? false : true;
+                    if(gaugeTimerId) {
+                        clearTimeout(gaugeTimerId);
+                    }
+                    if(runAnimation) {
+                        $('#runAnimation').text('Stop Animation');
+                        gaugeTimerCount = 0;
+                        gaugeTimerId = setInterval(function() {
+                            var value = 100 * $('#demoGauge2').simpleGauge('getValue');
+                            if(gaugeTimerCount > 0) {
+                                value -= Math.random() * 5;
+                                gaugeTimerCount--;
+                            } else if(gaugeTimerCount < 0) {
+                                value += Math.random() * 5;
+                                gaugeTimerCount++;
+                            } else {
+                                gaugeTimerCount = Math.round((Math.random() - 0.5) * 100);
+                            }
+                            if (value < 50) {
+                                value = 50;
+                                gaugeTimerCount = 0;
+                            } else if (value > 700) {
+                                value = 700;
+                                gaugeTimerCount = 0;
+                            }
+                            $('#demoGauge2').simpleGauge('setValue', value / 100);
+                        }, 250);
+                    } else {
+                        $('#runAnimation').text('Start Animation');
+                    }
+                });
+            });
+            </script>
             <div style="width: 21em; height: 1px;"></div>
         </td><td>&nbsp;</td><td style="vertical-align: top;">
             <textarea style="width: 54em; height: 46em;" readonly="readonly">
@@ -274,7 +276,49 @@ $(document).ready(function() {
     width:  20em;
     height: 20em;
 }
-&lt;/style></textarea>
+&lt;/style>
+
+&lt;!-- animation demo -->
+&lt;button id="runAnimation">Start Animation&lt;/button>
+&lt;script>
+$(document).ready(function() {
+  let runAnimation = false;
+  let gaugeTimerId;
+  let gaugeTimerCount;
+  $(document).on('click', '#runAnimation', function() {
+    runAnimation = runAnimation ? false : true;
+    if(gaugeTimerId) {
+      clearTimeout(gaugeTimerId);
+    }
+    if(runAnimation) {
+      $('#runAnimation').text('Stop Animation');
+      gaugeTimerCount = 0;
+      gaugeTimerId = setInterval(function() {
+        var value = 100 * $('#demoGauge2').simpleGauge('getValue');
+        if(gaugeTimerCount > 0) {
+          value -= Math.random() * 5;
+          gaugeTimerCount--;
+        } else if(gaugeTimerCount &lt; 0) {
+          value += Math.random() * 5;
+          gaugeTimerCount++;
+        } else {
+          gaugeTimerCount = Math.round((Math.random() - 0.5) * 100);
+        }
+        if (value &lt; 50) {
+          value = 50;
+          gaugeTimerCount = 0;
+        } else if (value > 700) {
+          value = 700;
+          gaugeTimerCount = 0;
+        }
+        $('#demoGauge2').simpleGauge('setValue', value / 100);
+      }, 250);
+    } else {
+      $('#runAnimation').text('Start Animation');
+    }
+  });
+});
+&lt;/script></textarea>
         </td></tr></table>
         <hr />
 <!-- === COMMON HEADER ======================== -->
