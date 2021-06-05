@@ -1,6 +1,6 @@
 /**
  * Simple analog and digital gauge plugin for jQuery to build dashboards
- * @version    1.0.1
+ * @version    1.0.2
  * @release    2021-06-04
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
@@ -87,7 +87,8 @@
                 marginLeft: (eWidth - cWidth) / 2,
                 marginTop:  (eHeight - cHeight) / 2,
                 width:      cWidth,
-                height:     cHeight
+                height:     cHeight,
+                overflow:   'hidden'
             });
             if(this.options.container) {
                 if(this.options.container.style) {
@@ -152,7 +153,7 @@
         getBarColor: function (value) {
             let color = '#666';
             this.options.bars.colors.forEach(function(set) {
-                if(set[0] <= value) {
+                if(Number(set[0]) <= value) {
                    color = set[1];
                 }
             });
@@ -168,12 +169,13 @@
             });
             let maxIdx = this.options.bars.colors.length - 1;
             this.options.bars.colors.forEach((colorArr, idx) => {
-                let startAngle = self.getAngleFromValue(colorArr[0]);
-                let endVal = idx + 1 > maxIdx ? this.options.max : this.options.bars.colors[idx + 1][0];
-                let endAngle = self.getAngleFromValue(endVal);
+                let value = Number(colorArr[0]);
                 let color  = colorArr[1];
                 let scale1 = Number(colorArr[2] || this.options.bars.scale1);
                 let scale2 = Number(colorArr[3] || this.options.bars.scale2);
+                let startAngle = self.getAngleFromValue(value);
+                let endVal = idx + 1 > maxIdx ? this.options.max : this.options.bars.colors[idx + 1][0];
+                let endAngle = self.getAngleFromValue(endVal);
                 let width1  = this.options.gaugeWidth * scale1 / 100;
                 let width2 = this.options.gaugeWidth * scale2 / 100;
                 let width = (width2 + width1) / 2;
@@ -311,7 +313,7 @@
 
         setValue: function (value) {
             debugLog('setValue(' + value + ')');
-            this.options.value = value;
+            this.options.value = Number(value);
             if(this.options.type.match(/\bdigital\b/)) {
                 this.setDigital();
             }
@@ -372,7 +374,7 @@
                         } else {
                             output[key] = this._mergeDeep(target[key], source[key]);
                         }
-                    } else {
+                    } else if(source[key] != undefined) {
                         Object.assign(output, { [key]: source[key] });
                     }
                 });
@@ -488,28 +490,28 @@
         pointer: {
             scale: 85,
             shape: [
-                '-3,-10',
-                '3,-10',
-                '3,-6.3',
-                '5,-5',
-                '6.3,-3',
-                '7,0',
-                '6.3,3',
-                '5,5',
-                '3,6.3',
-                '3,50',
+                '-2,-10',
+                '2,-10',
+                '2.1,-5.3',
+                '4,-4',
+                '5.3,-2.1',
+                '5.7,0',
+                '5.3,2.1',
+                '4,4',
+                '2.1,5.3',
+                '2,50',
                 '1.5,96',
                 '0,100',
-                '-1.5,96',
-                '-3,50',
-                '-3,6.3',
-                '-5,5',
-                '-6.3,3',
-                '-7,0',
-                '-6.3,-3',
-                '-5,-5',
-                '-3,-6.3',
-                '-3,-10'
+                '-1,96',
+                '-2,50',
+                '-2.1,5.3',
+                '-4,4',
+                '-5.3,2.1',
+                '-5.7,0',
+                '-5.3,-2.1',
+                '-4,-4',
+                '-2.1,-5.3',
+                '-2,-10'
             ].join(' '),
             style: {
                 color:       '#778',

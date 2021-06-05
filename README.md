@@ -113,7 +113,7 @@ Note: The scale value indicates the size, where 0 is the center of the gauge, an
 
 Note: The `pointer.shape` option defines the shape of the pointer in the form of space separated `x,y` coordinates. Coordinate `0,0` is the center of the gauge, `0,100` is tip of the pointer. The first and last coordinate should match. Default shape:
 
-`shape: '-3,-10 3,-10 3,-6.3 5,-5 6.3,-3 7,0 6.3,3 5,5 3,6.3 3,50 1.5,96 0,100 -1.5,96 -3,50 -3,6.3 -5,5 -6.3,3 -7,0 -6.3,-3 -5,-5 -3,-6.3 -3,-10'`
+`shape: '-2,-10 2,-10 2.1,-5.3 4,-4 5.3,-2.1 5.7,0 5.3,2.1 4,4 2.1,5.3 2,50 1.5,96 0,100 -1,96 -2,50 -2.1,5.3 -4,4 -5.3,2.1 -5.7,0 -5.3,-2.1 -4,-4 -2.1,-5.3 -2,-10'`
 
 ## Demo
 

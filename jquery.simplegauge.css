@@ -1,6 +1,6 @@
 /**
  * Simple analog and digital gauge plugin for jQuery to build dashboards
- * @version    1.0.1
+ * @version    1.0.2
  * @release    2021-06-04
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
@@ -8,7 +8,8 @@
  * @license    MIT, https://opensource.org/licenses/mit-license
  */
 .simpleGauge_container {
-    position: absolute;
+    position: relative;
+    overflow: hidden;
 }
 .simpleGauge {
     position: absolute;
@@ -23,7 +24,7 @@
 .simpleGauge_block {
     position: absolute;
     z-index: 3;
-    overflow: visible;
+    overflow: visible !important;
     top: 0;
     right: 0;
     bottom: 0;
