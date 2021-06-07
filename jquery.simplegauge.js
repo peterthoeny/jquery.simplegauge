@@ -1,7 +1,7 @@
 /**
  * Simple analog and digital gauge plugin for jQuery to build dashboards
- * @version    1.0.2
- * @release    2021-06-04
+ * @version    1.0.3
+ * @release    2021-06-07
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
@@ -410,13 +410,16 @@
         this.each(function () {
             let $this = $(this);
             let data = $this.data('plugin-simplegauge');
-            if(isInit && !data) {
-                $this.data('plugin-simplegauge', (data = new SimpleGauge($(this), options)));
+            if(isInit) {
+                if(data) {
+                    $this.html('');
+                }
+                $this.data('plugin-simplegauge', (data = new SimpleGauge($this, options)));
             } else if(typeof options === 'string') {
-                result = data[options](val);
+                result = data[options](val); // example: $('#demo').simpleGauge('setValue', 123);
             } else {
                 // ignore undefined state
-                debugLog('error with plugin parameters');
+                debugLog('plugin parameter error');
             }
         });
         return result;
