@@ -1,7 +1,7 @@
 /**
  * Simple analog and digital gauge plugin for jQuery to build dashboards
- * @version    1.0.3
- * @release    2021-06-07
+ * @version    1.1.0
+ * @release    2021-09-05
  * @repository https://github.com/peterthoeny/jquery.simplegauge
  * @author     Peter Thoeny, https://twiki.org/ & https://github.com/peterthoeny
  * @copyright  2021 Peter Thoeny, https://github.com/peterthoeny
@@ -208,10 +208,22 @@
             let step = (this.options.max - this.options.min) / this.options.labels.count;
             let width = this.options.gaugeWidth * this.options.labels.scale / 100;
             let height = this.options.gaugeHeight * this.options.labels.scale / 100;
+            let labelTemplate = this.options.labels.text;
+            if(typeof labelTemplate != 'string') {
+                labelTemplate = $.fn.simpleGauge.defaults.labels.text;
+            }
             for(let val = this.options.min; val <= this.options.max; val += step) {
                 let angle = this.getAngleFromValue(val);
                 let coord = this.getPointFromAngle(width, height, angle);
-                let $label = $('<div>').addClass('simpleGauge_label').text(val);
+                let labelVal = val;
+                let html = labelTemplate.replace(/\{value(?:\.(\d+))?\}/g, function(m, c1) {
+                    if(c1) {
+                        let factor = 10 ** parseInt(c1);
+                        labelVal = Math.round(labelVal * factor) / factor;
+                    }
+                    return labelVal.toString();
+                });
+                let $label = $('<div>').addClass('simpleGauge_label').html(html);
                 this.$labels.append($label);
                 let css = this._styleToCss(this.options.labels.style, {
                     left: coord[0] - $label.width() / 2,

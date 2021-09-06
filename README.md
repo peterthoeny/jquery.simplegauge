@@ -1,4 +1,4 @@
-# jquery.simplegauge v1.0.1
+# jquery.simplegauge v1.1.0
 
 [![GitHub issues](https://img.shields.io/github/issues/peterthoeny/jquery.simplegauge)](https://github.com/peterthoeny/jquery.simplegauge/issues)
 [![GitHub stars](https://img.shields.io/github/stars/peterthoeny/jquery.simplegauge)](https://github.com/peterthoeny/jquery.simplegauge/stargazers)
@@ -37,7 +37,7 @@ Once a gauge has been initialized you can get and set the value:
 $(document).ready(function() {
   var gaugeOptions = { value: 65 };
   $('#demoGauge').simpleGauge({ value: 65 });         // initialize with 65
-  $('#demoGauge').simpleGauge('setValue', 33);        // set value to 33
+  $('#demoGauge').simpleGauge('setValue', 33);        // set value to 33 after initialization
   let val = $('#demoGauge').simpleGauge('getValue');  // returns 33
 });
 </script>
@@ -108,6 +108,8 @@ $('#demoGauge').simpleGauge({
   debug:   true                 // show debug messages, default: false
 });
 ```
+
+Note: The `{value}` in `digital.text` and `lables.text` resolves to the value as is, a `{value.0}` resolves to the rounded value, a `{value.1}` resolves to the value rounded to one decimal place if needed, etc.
 
 Note: The scale value indicates the size, where 0 is the center of the gauge, and 100 is the edge of the gauge.
 
