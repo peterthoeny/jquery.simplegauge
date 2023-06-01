@@ -72,7 +72,7 @@ $('#demoGauge').simpleGauge({
     maxAngle:   150             // maximum angle in degrees, default: 120
   },
   labels: {                     // gauge labels:
-    text:   '{value}',          // text format of value, default: '{value}'
+    text:   '{value.1}',        // text format of value, default: '{value}'
     count:  7,                  // number of labels, default: 10
     scale:  73,                 // scale in percent, default: 95
     style:  'font-size: 20px;'  // style, default: ''
